@@ -8,7 +8,7 @@
     <item>
       <title>Version 0.1.0</title>
       <description>Initial version</description>
-      <enclosure url="https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/releases/download/v0.1.0/fr.y3s.sketch.screenshot.zip" sparkle:version="0.1.0" />
+      <enclosure url="https://github.com/sylvainleris/fr.y3s.sketch.screenshot/releases/download/0.1.0/fr.y3s.sketch.screenshot.zip" sparkle:version="0.1.0" />
     </item>
   </channel>
 </rss>
