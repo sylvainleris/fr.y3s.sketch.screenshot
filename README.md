@@ -1,5 +1,6 @@
 # Android Screenshot
 ![Android Screenshot](https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/master/images/logo.png)
+
 Android Screenshot is a plugin made for Sketch. It helps designers to take screenshots of Android device connected over USB.
 ## Dependencies
 Android Screenshot plugin embed adb tool available in Android SDK Platform-Tools. So, you don't have to install it.
