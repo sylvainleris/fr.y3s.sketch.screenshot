@@ -8,7 +8,7 @@ Android Screenshot plugin embed adb tool available in Android SDK Platform-Tools
 You have to enable USB Debugging Mode on your Android device.
 ## Installation
 ### Manual
-* [Download](https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/releases/latest) the latest release of the plugin [`fr.y3s.sketch.screenshot.zip`](https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/releases/latest)
+* [Download](https://github.com/sylvainleris/fr.y3s.sketch.screenshot/releases/latest) the latest release of the plugin [`fr.y3s.sketch.screenshot.zip`](https://github.com/sylvainleris/fr.y3s.sketch.screenshot/releases/latest)
 * Uncompress the downloaded file
 * Double-click `fr.y3s.sketch.screenshot.sketchplugin` to install it
 ## Usage
