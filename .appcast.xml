@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Device screenshot</title>
+    <link>https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/master/.appcast.xml</link>
+    <description>Take device screenshot</description>
+    <language>en</language>
+    <item>
+      <title>Version 0.1.0</title>
+      <description>Initial version</description>
+      <enclosure url="https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/releases/download/v0.1.0/fr.y3s.sketch.screenshot.zip" sparkle:version="0.1.0" />
+    </item>
+  </channel>
+</rss>
