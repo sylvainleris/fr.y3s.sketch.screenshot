@@ -128,7 +128,7 @@ function fillSelectedShapesWithImage(context, image) {
     for (let i = 0; i < selection.count(); i++) {
       let layer = selection[i]
       if (!layer.style().firstEnabledFill()) {
-        shape.style().addStylePartOfType(0)
+        layer.style().addStylePartOfType(0)
       }
 
       let fill = layer

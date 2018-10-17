@@ -1,0 +1,35 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 1,
+  "icon": "icon.png",
+  "commands": [
+    {
+      "name": "Insert Android Screenshot",
+      "shortcut": "command shift i",
+      "identifier": "fr.y3s.sketch.screenshot.android.insert",
+      "script": "screenshot.js",
+      "handler": "insertAndroidScreenshot"
+    },
+    {
+      "name": "Fill with Android Screenshot",
+      "shortcut": "command shift f",
+      "identifier": "fr.y3s.sketch.screenshot.android.fill",
+      "script": "screenshot.js",
+      "handler": "fillAndroidScreenshot"
+    }
+  ],
+  "menu": {
+    "title": "Android Screenshot",
+    "items": [
+      "fr.y3s.sketch.screenshot.android.fill",
+      "fr.y3s.sketch.screenshot.android.insert"
+    ]
+  },
+  "version": "0.1.0",
+  "name": "Android Screenshot",
+  "author": "Sylvain Leris",
+  "identifier": "fr.y3s.sketch.screenshot",
+  "description": "Take Android screenshot.",
+  "disableCocoaScriptPreprocessor": true,
+  "appcast": "https://raw.githubusercontent.com/sylvainleris/fr.y3s.sketch.screenshot/master/.appcast.xml"
+}
