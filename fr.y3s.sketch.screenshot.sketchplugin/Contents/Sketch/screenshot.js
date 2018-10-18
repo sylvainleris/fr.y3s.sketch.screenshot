@@ -102,10 +102,12 @@ var exports =
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fillAndroidScreenshot", function() { return fillAndroidScreenshot; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertAndroidScreenshot", function() { return insertAndroidScreenshot; });
-/* harmony import */ var sketch_ui__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch/ui */ "sketch/ui");
-/* harmony import */ var sketch_ui__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch_ui__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sketch */ "sketch");
+/* harmony import */ var sketch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sketch__WEBPACK_IMPORTED_MODULE_0__);
 
 var AdbTool = context.scriptPath.split("/").slice(0, -2).join("/") + "/Resources/adb";
+var Image = sketch__WEBPACK_IMPORTED_MODULE_0__["Image"],
+    UI = sketch__WEBPACK_IMPORTED_MODULE_0__["UI"];
 /**
  * Run adb command to take screenshot
  *
@@ -136,7 +138,7 @@ function runAdbDevices() {
 
 function getNbAdbDevices() {
   var adbDevices = runAdbDevices();
-  return adbDevices.componentsSeparatedByCharactersInSet(NSCharacterSet.newlineCharacterSet()).count() - 3;
+  return adbDevices.split("\n").length - 3;
 }
 /**
  * Run system command
@@ -174,27 +176,23 @@ function runCommandline(launchPath, args) {
 
 
 function insertImageAsNewShape(context, image) {
-  // Visible rect
   var visibleContentRect = context.document.contentDrawView().visibleContentRect();
   var width = image.size().width;
-  var height = image.size().height; // Create rect into center of the visible content rect
-
-  var rect = NSMakeRect(visibleContentRect.origin.x + (visibleContentRect.size.width - width) / 2, visibleContentRect.origin.y + (visibleContentRect.size.height - height) / 2, width, height); // Create new shape
-
-  var shape = MSRectangleShape.alloc().initWithFrame(rect); // Add style type 0 to shape styles
-
-  shape.style().addStylePartOfType(0); // Retrieve previous addded fill
-
-  var fill = shape.style().fills().firstObject(); // Set fill type to bitmap
-
-  fill.setFillType(4); // Set image to fill
-
-  fill.setImage(MSImageData.alloc().initWithImage(image)); // Update shape name
-
-  shape.setName("Android screenshot"); // Add shape to current page
-
-  context.document.currentPage().addLayer(shape);
-  sketch_ui__WEBPACK_IMPORTED_MODULE_0__["message"]("Screenshot successful");
+  var height = image.size().height;
+  var page = context.document.currentPage();
+  var bitmap = new Image({
+    parent: page,
+    type: sketch__WEBPACK_IMPORTED_MODULE_0__["Types"].Image,
+    frame: {
+      x: visibleContentRect.origin.x + (visibleContentRect.size.width - width) / 2,
+      y: visibleContentRect.origin.y + (visibleContentRect.size.height - height) / 2,
+      width: width,
+      height: height
+    },
+    image: image,
+    name: "Android screenshot"
+  });
+  UI.message("Screenshot successful");
 }
 /**
  * Fill selected shapes with the image
@@ -207,12 +205,10 @@ function insertImageAsNewShape(context, image) {
 function fillSelectedShapesWithImage(context, image) {
   var selection = context.selection;
 
-  if (selection.count() == 0) {
-    sketch_ui__WEBPACK_IMPORTED_MODULE_0__["message"]("Select at least one layer");
+  if (selection.isEmpty) {
+    UI.message("Select at least one layer");
   } else {
-    for (var i = 0; i < selection.count(); i++) {
-      var layer = selection[i];
-
+    selection.forEach(function (layer) {
       if (!layer.style().firstEnabledFill()) {
         layer.style().addStylePartOfType(0);
       }
@@ -221,31 +217,39 @@ function fillSelectedShapesWithImage(context, image) {
       fill.setFillType(4);
       fill.setImage(MSImageData.alloc().initWithImage(image));
       fill.setPatternFillType(1);
-    }
+    });
+    UI.message("Screenshot successful");
+  }
+}
+/**
+ * Check if android device is connected
+ *
+ * @returns Boolean
+ */
 
-    sketch_ui__WEBPACK_IMPORTED_MODULE_0__["message"]("Screenshot successful");
+
+function hasAndroidDeviceConnected() {
+  var nbAdbDevices = getNbAdbDevices();
+
+  if (nbAdbDevices > 0) {
+    return true;
+  } else {
+    UI.alert("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated");
+    return false;
   }
 }
 
 var fillAndroidScreenshot = function fillAndroidScreenshot(context) {
-  var nbAdbDevices = getNbAdbDevices();
-
-  if (nbAdbDevices > 0) {
+  if (hasAndroidDeviceConnected()) {
     var image = runAdbScreenshot();
     fillSelectedShapesWithImage(context, image);
-  } else {
-    sketch_ui__WEBPACK_IMPORTED_MODULE_0__["alert"]("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated");
   }
 };
 
 var insertAndroidScreenshot = function insertAndroidScreenshot(context) {
-  var nbAdbDevices = getNbAdbDevices();
-
-  if (nbAdbDevices > 0) {
+  if (hasAndroidDeviceConnected()) {
     var image = runAdbScreenshot();
     insertImageAsNewShape(context, image);
-  } else {
-    sketch_ui__WEBPACK_IMPORTED_MODULE_0__["alert"]("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated");
   }
 };
 
@@ -253,14 +257,14 @@ var insertAndroidScreenshot = function insertAndroidScreenshot(context) {
 
 /***/ }),
 
-/***/ "sketch/ui":
-/*!****************************!*\
-  !*** external "sketch/ui" ***!
-  \****************************/
+/***/ "sketch":
+/*!*************************!*\
+  !*** external "sketch" ***!
+  \*************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = require("sketch/ui");
+module.exports = require("sketch");
 
 /***/ })
 

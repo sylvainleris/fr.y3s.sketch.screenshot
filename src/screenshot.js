@@ -1,6 +1,11 @@
-import * as ui from 'sketch/ui';
+import * as sketch from 'sketch';
 
-const AdbTool = context.scriptPath.split("/").slice(0, -2).join("/") + "/Resources/adb"
+const AdbTool = context.scriptPath.split("/").slice(0, -2).join("/") + "/Resources/adb";
+
+const {
+  Image,
+  UI
+} = sketch;
 
 /**
  * Run adb command to take screenshot
@@ -8,8 +13,8 @@ const AdbTool = context.scriptPath.split("/").slice(0, -2).join("/") + "/Resourc
  * @returns NSImage
  */
 function runAdbScreenshot() {
-  let file = runCommandline(AdbTool, ["exec-out", "screencap", "-p"])
-  return NSImage.alloc().initWithData_(file.readDataToEndOfFile())
+  let file = runCommandline(AdbTool, ["exec-out", "screencap", "-p"]);
+  return NSImage.alloc().initWithData_(file.readDataToEndOfFile());
 }
 
 /**
@@ -18,8 +23,8 @@ function runAdbScreenshot() {
  * @returns NSString
  */
 function runAdbDevices() {
-  let file = runCommandline(AdbTool, ["devices"])
-  return NSString.alloc().initWithData_encoding(file.readDataToEndOfFile(), NSUTF8StringEncoding)
+  let file = runCommandline(AdbTool, ["devices"]);
+  return NSString.alloc().initWithData_encoding(file.readDataToEndOfFile(), NSUTF8StringEncoding);
 }
 
 /**
@@ -28,8 +33,8 @@ function runAdbDevices() {
  * @returns NSInteger
  */
 function getNbAdbDevices() {
-  let adbDevices = runAdbDevices()
-  return adbDevices.componentsSeparatedByCharactersInSet(NSCharacterSet.newlineCharacterSet()).count() - 3
+  let adbDevices = runAdbDevices();
+  return (adbDevices.split("\n").length - 3);
 }
 
 /**
@@ -52,17 +57,17 @@ function runCommandline(launchPath, args) {
   task.setStandardError(pipe);
 
   // Prepare command
-  task.setLaunchPath(launchPath)
-  task.setArguments(args)
+  task.setLaunchPath(launchPath);
+  task.setArguments(args);
 
   // Reader for response
-  var file = pipe.fileHandleForReading()
+  var file = pipe.fileHandleForReading();
 
   // Launch command
-  task.launch()
+  task.launch();
 
   // Return handle
-  return file
+  return file;
 }
 
 /**
@@ -73,43 +78,26 @@ function runCommandline(launchPath, args) {
  */
 function insertImageAsNewShape(context, image) {
 
-  // Visible rect
-  const visibleContentRect = context.document.contentDrawView().visibleContentRect()
-  const width = image.size().width
-  const height = image.size().height
+  const visibleContentRect = context.document.contentDrawView().visibleContentRect();
 
-  // Create rect into center of the visible content rect
-  const rect = NSMakeRect(
-    visibleContentRect.origin.x + (visibleContentRect.size.width - width) / 2,
-    visibleContentRect.origin.y + (visibleContentRect.size.height - height) / 2,
-    width,
-    height
-  )
+  const width = image.size().width;
+  const height = image.size().height;
+  const page = context.document.currentPage();
 
-  // Create new shape
-  const shape = MSRectangleShape.alloc().initWithFrame(rect)
+  const bitmap = new Image({
+    parent: page,
+    type: sketch.Types.Image,
+    frame: {
+      x: visibleContentRect.origin.x + (visibleContentRect.size.width - width) / 2,
+      y: visibleContentRect.origin.y + (visibleContentRect.size.height - height) / 2,
+      width: width,
+      height: height,
+    },
+    image: image,
+    name: "Android screenshot"
+  });
 
-  // Add style type 0 to shape styles
-  shape.style().addStylePartOfType(0)
-
-  // Retrieve previous addded fill
-  let fill = shape.style()
-    .fills()
-    .firstObject();
-
-  // Set fill type to bitmap
-  fill.setFillType(4);
-
-  // Set image to fill
-  fill.setImage(MSImageData.alloc().initWithImage(image));
-
-  // Update shape name
-  shape.setName("Android screenshot")
-
-  // Add shape to current page
-  context.document.currentPage().addLayer(shape)
-
-  ui.message("Screenshot successful")
+  UI.message("Screenshot successful");
 }
 
 /**
@@ -120,15 +108,14 @@ function insertImageAsNewShape(context, image) {
  */
 function fillSelectedShapesWithImage(context, image) {
 
-  let selection = context.selection
+  let selection = context.selection;
 
-  if (selection.count() == 0) {
-    ui.message("Select at least one layer");
+  if (selection.isEmpty) {
+    UI.message("Select at least one layer");
   } else {
-    for (let i = 0; i < selection.count(); i++) {
-      let layer = selection[i]
+    selection.forEach(function (layer) {
       if (!layer.style().firstEnabledFill()) {
-        layer.style().addStylePartOfType(0)
+        layer.style().addStylePartOfType(0);
       }
 
       let fill = layer
@@ -138,32 +125,39 @@ function fillSelectedShapesWithImage(context, image) {
       fill.setFillType(4);
       fill.setImage(MSImageData.alloc().initWithImage(image));
       fill.setPatternFillType(1);
-    }
-    ui.message("Screenshot successful")
+    });
+
+    UI.message("Screenshot successful");
+  }
+}
+
+/**
+ * Check if android device is connected
+ *
+ * @returns Boolean
+ */
+function hasAndroidDeviceConnected() {
+  let nbAdbDevices = getNbAdbDevices();
+
+  if (nbAdbDevices > 0) {
+    return true;
+  } else {
+    UI.alert("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated");
+    return false;
   }
 }
 
 let fillAndroidScreenshot = (context) => {
-
-  let nbAdbDevices = getNbAdbDevices()
-
-  if (nbAdbDevices > 0) {
-    let image = runAdbScreenshot()
-    fillSelectedShapesWithImage(context, image)
-  } else {
-    ui.alert("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated")
+  if (hasAndroidDeviceConnected()) {
+    let image = runAdbScreenshot();
+    fillSelectedShapesWithImage(context, image);
   }
 }
 
 let insertAndroidScreenshot = (context) => {
-
-  let nbAdbDevices = getNbAdbDevices()
-
-  if (nbAdbDevices > 0) {
-    let image = runAdbScreenshot()
-    insertImageAsNewShape(context, image)
-  } else {
-    ui.alert("Android screenshot", "You must have an Android device connected over USB with usb/debugging activated")
+  if (hasAndroidDeviceConnected()) {
+    let image = runAdbScreenshot();
+    insertImageAsNewShape(context, image);
   }
 }
 
